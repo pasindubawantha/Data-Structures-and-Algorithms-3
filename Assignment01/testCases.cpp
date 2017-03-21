@@ -1,7 +1,7 @@
 #include "lastFunction.cpp"
 /*
 ON USAGE:
-Compile and run this file. Add your own test cases as functions chech testcases using test(char character. int correctAnswer) function 
+Compile and run this file. Add your own test cases as functions check testcases using test(char character. int correctAnswer) function 
 
 TESTED COMPILER INFORMATION: 
 compiled using g++ 

@@ -1,0 +1,18 @@
+## Pseudo code for CalculateLast function
+
+Integer alphabetSize = 256
+Charachter alphabet[alphabetSize] = -1;
+
+function CalculateLast(String pattern){
+	FOR (Integer i = Size(pattern) - 1, i >= 0, i--)
+		IF(aplhabet[(Integer) pattern[i]] == -1)
+			aplhabet[(Integer) pattern[i]] = i ;ch
+		END IF
+	END FOR
+}
+
+## Psedo code for last function
+
+function last(Charachter c){
+	return alphabet[(Integer) c]
+}

@@ -15,7 +15,7 @@ Target: x86_64-apple-darwin16.4.0
 Thread model: posix
 */
 
-#define ALPHABET_SIZE 256 
+#define ALPHABET_SIZE 256 // 256 is the number of unique values that can be represented by 1 byte. and c++ char type has size 1 byte
 using namespace std;
 
 //function prototypes 

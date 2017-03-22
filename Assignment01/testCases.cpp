@@ -28,6 +28,8 @@ int main(void){
 	testCase3();
 	testCase4();
 	cout << "Total passed = " << totalPassed << " | Total failed = " << totalFailed << endl;
+	char a = 'a';
+	cout << sizeof(a);
 	return 0;
 }
 

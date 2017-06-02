@@ -1,5 +1,8 @@
 #include <iostream>
 using namespace std;
+
+// DO NOT COPY THESE COMMENTS !!!!!!
+// OF COURSE DO NOT COPY IT AS IT IS ANYWAY !!!!!
 /*
 Compiler data:
 Configured with: --prefix=/Applications/Xcode.app/Contents/Developer/usr --with-gxx-include-dir=/usr/include/c++/4.2.1

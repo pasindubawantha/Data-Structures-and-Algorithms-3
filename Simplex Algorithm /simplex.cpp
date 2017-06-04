@@ -50,22 +50,25 @@ x = empty array of size N
 
 function call :  simplex(A, b, c, x, m, n)
 */
+
+
 #define M 3 // 3 constrains
-#define N 3 // 3 variables 
+#define N 4 // 3 variables 
 
 float* simplex(float A[M][N], float b[], float c[], float x[], int m, int n);// simplex(constraintArray, constraintValues, objectiveFunctionCoefficents, arrayToReciveSolutionSet, noOfConstraints, noOfVariables)
 //in c you can't return an array by value therfore we have to send the solution set array from the main() function othervise we recive an empty array as simplex() function releases it's memory to the system after executing and there by losing all local variable data(variables created inside the function)
 //no point of returning the solution set but since the quection asks I'm returning a float array pointer without having 'void'
 void printTable(float table[M+1][M+N+2], int m, int n);//for debugging
+void sort(float valueArray[], int indexArray[], int size);
 
 int main(){//example
 	float A[M][N];//constraint matrix
 	float b[M];// Ax = b are the constraints 
 	float c[N];//coefiecients of the objective function
-	c[0] = 6; c[1] = 5; c[2] = 4;//objective function P = 6x + 5y + 4z
-	A[0][0] = 2; A[0][1] = 1; A[0][2] = 1; b[0] = 180;//constrain 1  2x + y + z <= 180 
-	A[1][0] = 1; A[1][1] = 3; A[1][2] = 2; b[1] = 300;//constrain 1  x + 3y + 2z <= 300 
-	A[2][0] = 2; A[2][1] = 1; A[2][2] = 2; b[2] = 240;//constrain 1  2x + y + 2z <= 240 
+	c[0] = 6; c[1] = 3; c[2] = 1; c[3]=4; //objective function p = 6x + 3y + z + 4w
+	A[0][0] = 1; A[0][1] = 1; A[0][2] =  1;  A[0][3] = 1;b[0] = 40;//   x   +y   +z   +w  <= 40
+	A[1][0] = 2; A[1][1] = 1; A[1][2] =  8;  A[1][3] =-1;b[1] = 100;// 2x   +y  +8z   -w  <= 100
+	A[2][0] = 3; A[2][1] = 4; A[2][2] = -1;  A[2][3] =-1;b[2] = 80;//  3x  +4y   -z   -w  >= 80
 
 	float x[N];//solution set 
 	simplex(A, b, c, x, M, N);// solutions are in the x[N] array
@@ -115,62 +118,89 @@ float* simplex(float A[M][N], float b[], float c[], float x[],int m, int n){
 	cout << "-------------------------------" << endl;
 	// Table has been filled
 	
-	bool foundNegative;
-	int colomn, row;
+	bool foundNegative, foundValidPivot;
+	int row,minimumIndex, colomnArraySize;
 	float minimum, divisor, multiplier;
+	int colomnsInDecendingOrder[n1-1];
+	float colomnsValuesInDecendingOrder[n1-1];
 	cout << "### Starting Simplex algorithm" << endl;
 	cout << "-------------------------------" << endl;
 	do{//executing simplex
 		foundNegative = false;
-		minimum = 0;
+		minimumIndex = 0;
 		for(int j = 0; j < n1 - 1; j++){//looking for minimum negatove colomn
-			if(table[m1-1][j] < minimum){
-				colomn = j;
-				minimum = table[m1-1][j];
+			if(table[m1-1][j] < 0){
+				colomnsValuesInDecendingOrder[minimumIndex] = table[m1-1][j];
+				colomnsInDecendingOrder[minimumIndex] = j;
+				minimumIndex++;
 				foundNegative = true;
 			}
 		}
-		minimum = table[0][n1-1] / table[0][colomn];
-		row = 0;
-		if(foundNegative){
+		colomnArraySize = minimumIndex;
+		sort(colomnsValuesInDecendingOrder, colomnsInDecendingOrder, colomnArraySize);
+		foundValidPivot = false; 
+		minimumIndex = 0;
+		while(!foundValidPivot && (minimumIndex < colomnArraySize) && foundNegative){
+			minimum = table[0][n1-1] / table[0][colomnsInDecendingOrder[minimumIndex]];
+			row = 0;
 			for(int i = 1; i < m1 - 1; i++){//looking for minimum row
-				if((table[i][n1-1] / table[i][colomn]) < minimum){
-					minimum = (table[i][n1-1] / table[i][colomn]);
+				if((table[i][n1-1] / table[i][colomnsInDecendingOrder[minimumIndex]]) < minimum){
+					minimum = (table[i][n1-1] / table[i][colomnsInDecendingOrder[minimumIndex]]);
 					row = i;
 				}
 			}
-			divisor = table[row][colomn];
+			if(table[row][colomnsInDecendingOrder[minimumIndex]] > 0){
+				foundValidPivot = true;					
+			}else{
+				minimumIndex++;
+			}
+		}
+
+		if(foundNegative && foundValidPivot){
+			divisor = table[row][colomnsInDecendingOrder[minimumIndex]];
 			for(int j = 0; j < n1; j++){//normalisiong row with leading variable
 				table[row][j] = table[row][j] / divisor; 
 			}
 			for(int i = 0; i < m1; i++){//subtracting all rows by selected row
 				if(i != row){
-					multiplier = -(table[i][colomn]);
+					multiplier = -(table[i][colomnsInDecendingOrder[minimumIndex]]);
 					for(int j = 0; j < n1; j++){
 						table[i][j] = (table[i][j] + (table[row][j] * multiplier));
 					}
 				}
 			}
 		}
+		
 	printTable(table, m1, n1);
-	if (foundNegative) cout << "Found Negatives did operations" << endl;
+	if (foundNegative && foundValidPivot) cout << "Found Negatives did operations" << endl;
 	else cout << "Didn't found Negatives no operations done" << endl;
 	cout << "-------------------------------" << endl;
-	}while(foundNegative);
+	}while(foundNegative && foundValidPivot);
 	//Simplex has been executed, extracting solution
 	cout << "### Extrating solutions from the table" << endl;
 	cout << "-------------------------------" << endl;
 	bool isZero;
+	bool foundLeadingOne;
+	int leadingOneAt;
 	for(int j = 0; j < n; j++){//extraction solutions, traversing colomns
 		isZero = false;
+		foundLeadingOne = false;
 		for(int i = 0; i < m1; i++){//traversing rows
-			if(j != i){
+			if(foundLeadingOne){
 				if(table[i][j] != 0) isZero = true;
+			}else{
+				if(table[i][j] == 1){
+					foundLeadingOne = true;
+					leadingOneAt = i;
+					cout << i << endl;
+				}else if(table[i][j] != 0){
+					isZero = true;
+				}
 			}
 		}
 		if(isZero) x[j] = 0;
-		else x[j] = table[j][n1-1]; // i = j at the corresponding variable
-
+		else if(foundLeadingOne) x[j] = table[leadingOneAt][n1-1]; // i = j at the corresponding variable
+		else x[j] = 0;
 	}
 
 	return x;
@@ -183,5 +213,26 @@ void printTable(float table[M+1][M+N+2], int m, int n){
 			cout << table[i][j] << " | ";
 		}
 		cout << endl;
+	}
+}
+
+void sort(float valueArray[], int indexArray[], int size){
+	int traversIndex, minimumIndex, tmpIndex;
+	float tmpValue;
+	for(int currentIndex = 0; currentIndex < size; currentIndex++){
+		traversIndex = currentIndex;
+		minimumIndex = traversIndex;
+		while(traversIndex < size){
+			traversIndex++;
+			if(valueArray[traversIndex] < valueArray[minimumIndex])minimumIndex = traversIndex;
+
+		}
+		tmpValue = valueArray[currentIndex];
+		tmpIndex = indexArray[currentIndex];
+		valueArray[currentIndex] = valueArray[minimumIndex];
+		indexArray[currentIndex] = indexArray[minimumIndex];
+		valueArray[minimumIndex] = tmpValue;
+		indexArray[minimumIndex] = tmpIndex;
+
 	}
 }

@@ -65,11 +65,10 @@ int main(){//example
 	float A[M][N];//constraint matrix
 	float b[M];// Ax = b are the constraints 
 	float c[N];//coefiecients of the objective function
-	c[0] = 6; c[1] = 3; c[2] = 1; c[3]=4; //objective function p = 6x + 3y + z + 4w
-	A[0][0] = 1; A[0][1] = 1; A[0][2] =  1;  A[0][3] = 1;b[0] = 40;//   x   +y   +z   +w  <= 40
-	A[1][0] = 2; A[1][1] = 1; A[1][2] =  8;  A[1][3] =-1;b[1] = 100;// 2x   +y  +8z   -w  <= 100
-	A[2][0] = 3; A[2][1] = 4; A[2][2] = -1;  A[2][3] =-1;b[2] = 80;//  3x  +4y   -z   -w  >= 80
-
+	c[0] = 1; c[1] = 2; c[2] = -1; //objective function p = x + 2y + -z
+	A[0][0] = 2; A[0][1] = 1; A[0][2] = 1; b[0] = 14;//2x + y + z <=  14
+	A[1][0] = 4; A[1][1] = 2; A[1][2] = 3; b[1] = 28;//4x + 2y + 3z <= 28,
+	A[2][0] = 2; A[2][1] = 5; A[2][2] = 5; b[2] = 30;//2x + 5y + 5z <= 30,
 	float x[N];//solution set 
 	simplex(A, b, c, x, M, N);// solutions are in the x[N] array
 	cout << "##Solution" << endl;
@@ -119,10 +118,10 @@ float* simplex(float A[M][N], float b[], float c[], float x[],int m, int n){
 	// Table has been filled
 	
 	bool foundNegative, foundValidPivot;
-	int row,minimumIndex, colomnArraySize;
+	int row, colomn, minimumIndex, minimumRowIndex, colomnArraySize;
 	float minimum, divisor, multiplier;
-	int colomnsInDecendingOrder[n1-1];
-	float colomnsValuesInDecendingOrder[n1-1];
+	int colomnsInDecendingOrder[n1-1], rowsInDecendingOrder[m1-1];
+	float colomnsValuesInDecendingOrder[n1-1], rowsValuesInDecendingOrder[m1-1];
 	cout << "### Starting Simplex algorithm" << endl;
 	cout << "-------------------------------" << endl;
 	do{//executing simplex
@@ -140,30 +139,36 @@ float* simplex(float A[M][N], float b[], float c[], float x[],int m, int n){
 		sort(colomnsValuesInDecendingOrder, colomnsInDecendingOrder, colomnArraySize);
 		foundValidPivot = false; 
 		minimumIndex = 0;
+		minimumRowIndex = 0;
 		while(!foundValidPivot && (minimumIndex < colomnArraySize) && foundNegative){
-			minimum = table[0][n1-1] / table[0][colomnsInDecendingOrder[minimumIndex]];
-			row = 0;
-			for(int i = 1; i < m1 - 1; i++){//looking for minimum row
-				if((table[i][n1-1] / table[i][colomnsInDecendingOrder[minimumIndex]]) < minimum){
-					minimum = (table[i][n1-1] / table[i][colomnsInDecendingOrder[minimumIndex]]);
-					row = i;
+			for(int i = 0; i < m1 - 1; i++){//looking for minimum row
+				rowsInDecendingOrder[i] = i;
+				rowsValuesInDecendingOrder[i] = (table[i][n1-1] / table[i][colomnsInDecendingOrder[minimumIndex]]);
+			}
+			sort(rowsValuesInDecendingOrder, rowsInDecendingOrder, m1-1);
+			while(!foundValidPivot && (minimumRowIndex < m1-1)){
+				if(table[rowsInDecendingOrder[minimumRowIndex]][colomnsInDecendingOrder[minimumIndex]] > 0){
+					foundValidPivot = true;					
+				}else{
+					minimumRowIndex++;
 				}
 			}
-			if(table[row][colomnsInDecendingOrder[minimumIndex]] > 0){
-				foundValidPivot = true;					
-			}else{
-				minimumIndex++;
+			if(!foundValidPivot){
+				minimumIndex++;				
 			}
 		}
 
+		row = rowsInDecendingOrder[minimumRowIndex];
+		colomn = colomnsInDecendingOrder[minimumIndex];
+
 		if(foundNegative && foundValidPivot){
-			divisor = table[row][colomnsInDecendingOrder[minimumIndex]];
+			divisor = table[row][colomn];
 			for(int j = 0; j < n1; j++){//normalisiong row with leading variable
 				table[row][j] = table[row][j] / divisor; 
 			}
 			for(int i = 0; i < m1; i++){//subtracting all rows by selected row
 				if(i != row){
-					multiplier = -(table[i][colomnsInDecendingOrder[minimumIndex]]);
+					multiplier = -(table[i][colomn]);
 					for(int j = 0; j < n1; j++){
 						table[i][j] = (table[i][j] + (table[row][j] * multiplier));
 					}
@@ -222,9 +227,8 @@ void sort(float valueArray[], int indexArray[], int size){
 		traversIndex = currentIndex;
 		minimumIndex = traversIndex;
 		while(traversIndex < size){
+			if(valueArray[traversIndex] < valueArray[minimumIndex]) minimumIndex = traversIndex;
 			traversIndex++;
-			if(valueArray[traversIndex] < valueArray[minimumIndex])minimumIndex = traversIndex;
-
 		}
 		tmpValue = valueArray[currentIndex];
 		tmpIndex = indexArray[currentIndex];
@@ -232,6 +236,6 @@ void sort(float valueArray[], int indexArray[], int size){
 		indexArray[currentIndex] = indexArray[minimumIndex];
 		valueArray[minimumIndex] = tmpValue;
 		indexArray[minimumIndex] = tmpIndex;
-
 	}
+
 }

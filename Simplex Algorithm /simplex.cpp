@@ -192,7 +192,6 @@ float* simplex(float A[M][N], float b[], float c[], float x[],int m, int n){
 				if(table[i][j] == 1){
 					foundLeadingOne = true;
 					leadingOneAt = i;
-					cout << i << endl;
 				}else if(table[i][j] != 0){
 					isZero = true;
 				}

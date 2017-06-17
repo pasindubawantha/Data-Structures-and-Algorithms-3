@@ -65,10 +65,11 @@ int main(){//example
 	float A[M][N];//constraint matrix
 	float b[M];// Ax = b are the constraints 
 	float c[N];//coefiecients of the objective function
-	c[0] = 1; c[1] = 2; c[2] = -1; //objective function p = x + 2y + -z
-	A[0][0] = 2; A[0][1] = 1; A[0][2] = 1; b[0] = 14;//2x + y + z <=  14
-	A[1][0] = 4; A[1][1] = 2; A[1][2] = 3; b[1] = 28;//4x + 2y + 3z <= 28,
-	A[2][0] = 2; A[2][1] = 5; A[2][2] = 5; b[2] = 30;//2x + 5y + 5z <= 30,
+	c[0] = 6; c[1] = 5; c[2] = 4;//objective function P = 6x + 5y + 4z
+	A[0][0] = 2; A[0][1] = 1; A[0][2] = 1; b[0] = 180;//constrain 1  2x + y + z <= 180 
+	A[1][0] = 1; A[1][1] = 3; A[1][2] = 2; b[1] = 300;//constrain 1  x + 3y + 2z <= 300 
+	A[2][0] = 2; A[2][1] = 1; A[2][2] = 2; b[2] = 240;//constrain 1  2x + y + 2z <= 240 
+
 	float x[N];//solution set 
 	simplex(A, b, c, x, M, N);// solutions are in the x[N] array
 	cout << "##Solution" << endl;

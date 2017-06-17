@@ -36,7 +36,7 @@ void prefixFucntion(char pattern[] , int table[]){
 			table[i] = 0;
 			i++;
 		}else{
-			j--;
+			j--
 			j = table[j];
 		}
 	}
